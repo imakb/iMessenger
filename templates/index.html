@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iMessenger</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            height: 600px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar {
+            width: 30%;
+            border-right: 1px solid #e1e1e1;
+            overflow-y: scroll;
+            padding: 10px;
+        }
+        .contact {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #e1e1e1;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .contact:hover {
+            background-color: #f0f0f0;
+        }
+        .initial-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-block;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            background-color: #007BFF;
+            color: white;
+            font-weight: bold;
+        }
+        .chat {
+            width: 70%;
+            padding: 10px;
+            overflow-y: scroll;
+            position: relative;
+        }
+        .input-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-top: 1px solid #e1e1e1;
+            display: flex;
+            align-items: center;
+        }
+        .input-bar input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .input-bar button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .input-bar button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+            max-width: 60%;
+            clear: both;
+        }
+        .you {
+            background-color: #007BFF;
+            color: white;
+            float: right;
+            border-bottom-right-radius: 0;
+        }
+        .other {
+            background-color: #E5E5EA;
+            float: left;
+            border-bottom-left-radius: 0;
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: right; margin-bottom: 20px;">
+        <button onclick="location.href='/logout'">Logout</button>
+    </div>
+    <h1>Welcome to iMessenger!</h1>
+    <p>This is a prototype Apple iMessage web interface created by AKB. This is designed to test the concept of accessing your iMessages in any browser without needing to be Apple native.</p>
+    <div class="container">
+        <div class="sidebar">
+            {% for contact in conversations.keys() %}
+                <div class="contact" onclick="showConversation('{{ contact }}')">
+                    <span class="initial-icon">{{ contact[0] }}</span>{{ contact }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="chat"></div>
+        <div class="input-bar">
+            <input type="text" placeholder="Type here..." id="message-input">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    <script>
+        function showConversation(contact) {
+            const chatDiv = document.querySelector('.chat');
+            chatDiv.innerHTML = '';
+            const messages = {{ conversations|tojson }};
+            messages[contact].forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(message.sender === 'You' ? 'you' : 'other');
+                messageDiv.textContent = message.content;
+                chatDiv.appendChild(messageDiv);
+            });
+            const inputBar = document.querySelector('.input-bar');
+            inputBar.style.display = 'flex';
+        }
+        function sendMessage() {
+            const inputElement = document.getElementById('message-input');
+            const message = inputElement.value;
+            console.log(message);
+            inputElement.value = '';
+        }
+    </script>
+</body>
+</html>
